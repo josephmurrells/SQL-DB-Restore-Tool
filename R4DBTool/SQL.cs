@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Smo;
 
@@ -47,21 +48,28 @@ namespace R4DBTool
             restore.SqlRestore(SqlServer);
 
             SqlServer.ConnectionContext.Disconnect();
+            MessageBox.Show($"Database {DatabaseName} Successfully Restored!", "Success!", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
         }
 
         public void DropDb()
         {
-            if (!CheckDbExists())
+            if (!CheckDbExists() || CheckDbInUse())
             {
-                MessageBox.Show("Database with this name doesn't exist.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Database {DatabaseName} doesn't exist or is in use.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
             Database.Drop();
+            MessageBox.Show($"Database {DatabaseName} Successfully Dropped!", "Success!", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
         }
 
         private bool CheckDbExists()
         {
             return SqlServer.Databases.Contains(DatabaseName);
+        }
+
+        private bool CheckDbInUse()
+        {
+            return SqlServer.GetActiveDBConnectionCount(DatabaseName) > 0;
         }
     }
 }
