@@ -11,7 +11,7 @@ namespace R4DBTool
             InitializeComponent();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private async void button1_Click(object sender, EventArgs e)
         {
             OpenFileDialog openFileDialog1 = new()
             {
@@ -41,7 +41,11 @@ namespace R4DBTool
                 else
                 {
                     var Sql = new SQL(textBox1.Text);
-                    Sql.RestoreDb(openFileDialog1.FileName, openFileDialog1.SafeFileName, textBox2.Text);
+                    await Task.Run(() =>
+                    {
+                        Sql.RestoreDb(openFileDialog1.FileName, openFileDialog1.SafeFileName, textBox2.Text);
+                    });
+                    
                 }
 
             }
@@ -50,7 +54,7 @@ namespace R4DBTool
             button2.Enabled = true;
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private async void button2_Click(object sender, EventArgs e)
         {
             DialogResult dialog = MessageBox.Show($"Are you sure you want to drop {textBox1.Text}?", "Continue?", MessageBoxButtons.YesNo);
             if (dialog == DialogResult.No)
@@ -60,7 +64,10 @@ namespace R4DBTool
             button1.Enabled = false;
             button2.Enabled = false;
             var Sql = new SQL(textBox1.Text);
-            Sql.DropDb();
+            await Task.Run(() =>
+            {
+                Sql.DropDb();
+            });
             button1.Enabled = true;
             button2.Enabled = true;
         }
