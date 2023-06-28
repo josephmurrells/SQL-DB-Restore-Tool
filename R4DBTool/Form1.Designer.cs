@@ -35,6 +35,7 @@
             textBox2 = new TextBox();
             label2 = new Label();
             button3 = new Button();
+            label3 = new Label();
             SuspendLayout();
             // 
             // button1
@@ -49,6 +50,7 @@
             // 
             // button2
             // 
+            button2.Enabled = false;
             button2.Location = new Point(150, 101);
             button2.Name = "button2";
             button2.Size = new Size(132, 36);
@@ -99,12 +101,23 @@
             button3.UseVisualStyleBackColor = true;
             button3.Click += button3_Click;
             // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Location = new Point(12, 140);
+            label3.Name = "label3";
+            label3.Size = new Size(38, 15);
+            label3.TabIndex = 8;
+            label3.Text = "label3";
+            label3.Visible = false;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             AutoValidate = AutoValidate.EnableAllowFocusChange;
-            ClientSize = new Size(341, 140);
+            ClientSize = new Size(355, 158);
+            Controls.Add(label3);
             Controls.Add(button3);
             Controls.Add(label2);
             Controls.Add(textBox2);
@@ -129,5 +142,6 @@
         private TextBox textBox2;
         private Label label2;
         private Button button3;
+        private Label label3;
     }
 }

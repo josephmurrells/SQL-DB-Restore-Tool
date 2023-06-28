@@ -6,9 +6,11 @@ namespace R4DBTool
 {
     public partial class Form1 : Form
     {
+        List<string> DbList { get; set; }
         public Form1()
         {
             InitializeComponent();
+            DbList = new List<string>();
         }
 
         private async void button1_Click(object sender, EventArgs e)
@@ -40,41 +42,58 @@ namespace R4DBTool
                 }
                 else
                 {
+                    label3.Text = "Restoring Database...Please wait";
+                    label3.Visible = true;
                     var Sql = new SQL(textBox1.Text);
+                    DbList.Add(textBox1.Text);
                     await Task.Run(() =>
                     {
                         Sql.RestoreDb(openFileDialog1.FileName, openFileDialog1.SafeFileName, textBox2.Text);
                     });
-                    
+                    label3.Visible = false;
                 }
 
             }
 
             button1.Enabled = true;
-            button2.Enabled = true;
+            if (DbList.Count > 0)
+            {
+                button2.Enabled = true;
+            }
+
+            if (DbList.Count > 1)
+            {
+                button2.Text = "Drop Databases";
+            }
         }
 
         private async void button2_Click(object sender, EventArgs e)
         {
-            DialogResult dialog = MessageBox.Show($"Are you sure you want to drop {textBox1.Text}?", "Continue?", MessageBoxButtons.YesNo);
+            DialogResult dialog = MessageBox.Show($"Are you sure you want to drop databases: {string.Join(", ", DbList.DefaultIfEmpty(textBox1.Text))}?", "Continue?", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
             if (dialog == DialogResult.No)
             {
                 return;
             }
             button1.Enabled = false;
             button2.Enabled = false;
-            var Sql = new SQL(textBox1.Text);
-            await Task.Run(() =>
+            label3.Text = "Dropping Database...Please wait";
+            label3.Visible = true;
+            foreach (string dbName in DbList.DefaultIfEmpty(textBox1.Text))
             {
-                Sql.DropDb();
-            });
+                var Sql = new SQL(dbName);
+                await Task.Run(() =>
+                {
+                    Sql.DropDb();
+                });
+            }
+            label3.Visible = false;
             button1.Enabled = true;
-            button2.Enabled = true;
+            DbList.Clear();
         }
 
         private void button3_Click(object sender, EventArgs e)
         {
-            var folderPath = new FolderBrowserDialog();
+            FolderBrowserDialog folderPath = new();
             DialogResult = folderPath.ShowDialog();
             textBox2.Text = folderPath.SelectedPath;
         }
