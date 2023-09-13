@@ -15,44 +15,23 @@ namespace R4DBTool
 
         private async void button1_Click(object sender, EventArgs e)
         {
-            OpenFileDialog openFileDialog1 = new()
+            button1.Enabled = false;
+            button2.Enabled = false;
+            if (textBox1.Text == "" || textBox2.Text == "" || !Directory.Exists(textBox2.Text) || !File.Exists(textBox3.Text))
             {
-                InitialDirectory = @"C:\",
-                Title = "Browse bak Files",
-
-                CheckFileExists = true,
-                CheckPathExists = true,
-
-                DefaultExt = "bak",
-                Filter = "backup files (*.bak)|*.bak",
-                FilterIndex = 2,
-                RestoreDirectory = true,
-
-                ReadOnlyChecked = true,
-                ShowReadOnly = true
-            };
-
-            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+                MessageBox.Show("Invalid database name or output path", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else
             {
-                button1.Enabled = false;
-                button2.Enabled = false;
-                if (textBox1.Text == "" || textBox2.Text == "" || !Directory.Exists(textBox2.Text))
+                label3.Text = "Restoring Database...Please wait";
+                label3.Visible = true;
+                var Sql = new SQL(textBox1.Text);
+                DbList.Add(textBox1.Text);
+                await Task.Run(() =>
                 {
-                    MessageBox.Show("Invalid database name or output path", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-                else
-                {
-                    label3.Text = "Restoring Database...Please wait";
-                    label3.Visible = true;
-                    var Sql = new SQL(textBox1.Text);
-                    DbList.Add(textBox1.Text);
-                    await Task.Run(() =>
-                    {
-                        Sql.RestoreDb(openFileDialog1.FileName, openFileDialog1.SafeFileName, textBox2.Text);
-                    });
-                    label3.Visible = false;
-                }
-
+                    Sql.RestoreDb(textBox3.Text, Path.GetFileName(textBox3.Text), textBox2.Text);
+                });
+                label3.Visible = false;
             }
 
             button1.Enabled = true;
@@ -96,6 +75,32 @@ namespace R4DBTool
             FolderBrowserDialog folderPath = new();
             DialogResult = folderPath.ShowDialog();
             textBox2.Text = folderPath.SelectedPath;
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog BackupFile = new()
+            {
+                InitialDirectory = @"C:\",
+                Title = "Browse bak Files",
+
+                CheckFileExists = true,
+                CheckPathExists = true,
+
+                DefaultExt = "bak",
+                Filter = "backup files (*.bak)|*.bak",
+                FilterIndex = 2,
+                RestoreDirectory = true,
+
+                ReadOnlyChecked = true,
+                ShowReadOnly = true
+            };
+
+            if (BackupFile.ShowDialog() == DialogResult.OK)
+            {
+                textBox3.Text = BackupFile.FileName;
+            }
+
         }
     }
 }
